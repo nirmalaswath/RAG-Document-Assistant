@@ -1,34 +1,38 @@
 const { generateEmbedding } = require("./embeddingService");
 const documents = require("./documents");
-const { cosineSimilarity } = require("./vectorUtils");
+const { retrieveDocuments } = require("./ragService");
+const { generateAnswer } = require("./llmService");
 
 async function main() {
+  // Create embeddings for our documents
   for (const document of documents) {
     document.embedding = await generateEmbedding(document.content);
   }
 
-  const question = "What is a message queue?";
+  const question = "How does AWS Lambda run code?";
 
-  const questionEmbedding = await generateEmbedding(question);
+  // Retrieve relevant documents
+  const retrievedDocuments = await retrieveDocuments(question, 2);
 
-  const results = documents.map((document) => {
-    const similarity = cosineSimilarity(
-      questionEmbedding,
-      document.embedding
+  console.log("\nRetrieved documents:");
+
+  retrievedDocuments.forEach((doc) => {
+    console.log(
+      `${doc.topic} - similarity: ${doc.similarity.toFixed(3)}`
     );
-
-    return {
-      topic: document.topic,
-      similarity
-    };
   });
 
-  results.sort((a, b) => b.similarity - a.similarity);
+  // Build context
+  const context = retrievedDocuments
+    .map((doc) => `${doc.topic}: ${doc.content}`)
+    .join("\n\n");
 
-  console.log("\nQuestion:", question);
-  console.log("\nSearch results:");
+  console.log(context, 'Content check')
+  // Generate answer
+  const answer = await generateAnswer(question, context);
 
-  console.log(results);
+  console.log("\nAnswer:");
+  console.log(answer);
 }
 
 main();
