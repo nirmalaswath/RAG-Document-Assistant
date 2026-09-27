@@ -9,7 +9,7 @@ async function main() {
     document.embedding = await generateEmbedding(document.content);
   }
 
-  const question = "How does AWS Lambda run code?";
+  const question = "What is the visibility timeout in SQS?";
 
   // Retrieve relevant documents
   const retrievedDocuments = await retrieveDocuments(question, 2);
