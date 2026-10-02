@@ -1,30 +1,18 @@
 const { generateEmbedding } = require("./embeddingService");
-const documents = require("./documents");
-const { cosineSimilarity } = require("./vectorUtils");
+const { searchDocuments } = require("./vectorStore");
 
-async function retrieveDocuments(question, topK = 2) {
-  // Generate embedding for the question
+async function retrieveDocuments(question, topK = 3) {
   const questionEmbedding = await generateEmbedding(question);
 
-  // Compare question with every document
-  const results = documents.map((document) => {
-    
-    const similarity = cosineSimilarity(
-      questionEmbedding,
-      document.embedding
-    );
+  const results = await searchDocuments(questionEmbedding, topK);
 
-    return {
-      ...document,
-      similarity
-    };
-  });
+  const documents = results.documents?.[0] || [];
+  const distances = results.distances?.[0] || [];
 
-  // Highest similarity first
-  results.sort((a, b) => b.similarity - a.similarity);
-
-  // Return only the most relevant documents
-  return results.slice(0, topK);
+  return documents.map((document, index) => ({
+    content: document,
+    distance: distances[index]
+  }));
 }
 
 module.exports = {
