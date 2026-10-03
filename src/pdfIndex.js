@@ -6,6 +6,8 @@ const {
   searchDocuments
 } = require("./vectorStore");
 
+// sudo docker run -d --name chroma -p 8000:8000 chromadb/chroma
+
 async function main() {
   // 1. Read PDF + create embeddings
   const documents = await ingestPdf("data/PDF-Guide-Node-Andrew-Mead-v3.pdf");
@@ -14,7 +16,7 @@ async function main() {
   await storeDocuments(documents);
 
   // 3. User question
-  const question = "who is Nirmal?";
+  const question = "How to import a file?";
 
   // 4. Convert question to embedding
   const results = await askQuestion(question);
@@ -28,7 +30,7 @@ async function main() {
   console.log("\nRetrieved documents:");
   console.log(results, 'results')
 
-  console.dir(results, { depth: null });
+  // console.dir(results, { depth: null });
 }
 
 main();

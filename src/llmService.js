@@ -7,9 +7,21 @@ const groq = new Groq({
 });
 
 async function generateAnswer(question, context) {
-  const prompt = `
-Answer the user's question using the provided context.
+//   const prompt = `
+// Answer the user's question using the provided context.
 
+// If the answer cannot be found in the context, say:
+// "I don't have enough information in the provided documents."
+
+// Context:
+// ${context}
+
+// Question:
+// ${question}
+// `;
+  const prompt = `
+Based on the user's question Rank the context based on the correct meaning.
+Your answer should be in a object.
 If the answer cannot be found in the context, say:
 "I don't have enough information in the provided documents."
 
@@ -18,8 +30,7 @@ ${context}
 
 Question:
 ${question}
-`;
-
+`
   const completion = await groq.chat.completions.create({
     model: "openai/gpt-oss-20b",
     messages: [

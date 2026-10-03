@@ -11,7 +11,9 @@ async function storeDocuments(documents) {
     embeddings: documents.map((doc) => doc.embedding),
 
     metadatas: documents.map((doc) => ({
-      source: "Node-Guide.pdf"
+      source: "Node-Guide.pdf",
+      chunkId: doc.id,
+      topic: doc.topic || 'general'
     }))
   });
 
@@ -23,7 +25,10 @@ async function searchDocuments(queryEmbedding, topK = 3) {
   
     const results = await collection.query({
       queryEmbeddings: [queryEmbedding],
-      nResults: topK
+      nResults: topK,
+      where: {
+        source: "Node-Guide.pdf"
+      }
     });
   
     return results;
